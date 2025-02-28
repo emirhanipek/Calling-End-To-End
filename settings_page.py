@@ -1,9 +1,11 @@
+import time
+from selenium.webdriver.common.by import By  
+from utils import click_element , close_popup
 
 
 def settings_pages(driver):
     try:
-        time.sleep(2)  # Sayfa yüklenmesi için bekleme
-        
+        time.sleep(10)  
         # Company Name
         companyName = driver.find_element(By.XPATH, '//*[@id="companyName"]')
         companyName.clear()
@@ -12,8 +14,9 @@ def settings_pages(driver):
         time.sleep(1)
         click_submit = driver.find_element(By.XPATH, '//*[@id="app"]/div/main/div/form/div[5]/button')
         click_submit.click()
-        click_element(driver, By.XPATH, "/html/body/div[7]/div/div[6]/button[1]")
+        close_popup(driver)
         time.sleep(2)
+        
         
         # Short Name
         shortname = driver.find_element(By.XPATH, '//*[@id="shortName"]')
@@ -24,7 +27,7 @@ def settings_pages(driver):
         click_submit = driver.find_element(By.XPATH, '//*[@id="app"]/div/main/div/form/div[5]/button')
         click_submit.click()
         time.sleep(2)
-        click_element(driver, By.XPATH, "/html/body/div[7]/div/div[6]/button[1]")
+        close_popup(driver)
         
         # Phone
         phone = driver.find_element(By.XPATH, '//*[@id="phone"]')
@@ -35,7 +38,7 @@ def settings_pages(driver):
         click_submit = driver.find_element(By.XPATH, '//*[@id="app"]/div/main/div/form/div[5]/button')
         click_submit.click()
         time.sleep(2)
-        click_element(driver, By.XPATH, "/html/body/div[7]/div/div[6]/button[1]")
+        close_popup(driver)
         
         # Email
         email = driver.find_element(By.XPATH, '//*[@id="email"]')
@@ -46,7 +49,7 @@ def settings_pages(driver):
         click_submit = driver.find_element(By.XPATH, '//*[@id="app"]/div/main/div/form/div[5]/button')
         click_submit.click()
         time.sleep(2)
-        click_element(driver, By.XPATH, "/html/body/div[7]/div/div[6]/button[1]")
+        close_popup(driver)
         
         # Address
         address = driver.find_element(By.XPATH, '//*[@id="address"]')
@@ -57,7 +60,7 @@ def settings_pages(driver):
         click_submit = driver.find_element(By.XPATH, '//*[@id="app"]/div/main/div/form/div[5]/button')
         click_submit.click()
         time.sleep(2)
-        click_element(driver, By.XPATH, "/html/body/div[7]/div/div[6]/button[1]")
+        close_popup(driver)
         
         # Start Time
         startsAt = driver.find_element(By.XPATH, '//*[@id="startsAt"]')
@@ -68,7 +71,7 @@ def settings_pages(driver):
         click_submit = driver.find_element(By.XPATH, '//*[@id="app"]/div/main/div/form/div[5]/button')
         click_submit.click()
         time.sleep(2)
-        click_element(driver, By.XPATH, "/html/body/div[7]/div/div[6]/button[1]")
+        close_popup(driver)
         
         # Finish Time
         finishesAt = driver.find_element(By.XPATH, '//*[@id="finishesAt"]')
@@ -79,7 +82,7 @@ def settings_pages(driver):
         click_submit = driver.find_element(By.XPATH, '//*[@id="app"]/div/main/div/form/div[5]/button')
         click_submit.click()
         time.sleep(2)
-        click_element(driver, By.XPATH, "/html/body/div[7]/div/div[6]/button[1]")
+        close_popup(driver)
         
         # About Us
         aboutus = driver.find_element(By.XPATH, '//*[@id="about"]')
@@ -91,7 +94,7 @@ def settings_pages(driver):
         click_submit = driver.find_element(By.XPATH, '//*[@id="app"]/div/main/div/form/div[5]/button')
         click_submit.click()
         time.sleep(2)
-        click_element(driver, By.XPATH, "/html/body/div[7]/div/div[6]/button[1]")
+        close_popup(driver)
         
         # Assistant Name
         assistantName = driver.find_element(By.XPATH, '//*[@id="assistantName"]')
@@ -102,7 +105,7 @@ def settings_pages(driver):
         click_submit = driver.find_element(By.XPATH, '//*[@id="app"]/div/main/div/form/div[5]/button')
         click_submit.click()
         time.sleep(2)
-        click_element(driver, By.XPATH, "/html/body/div[7]/div/div[6]/button[1]")
+        close_popup(driver)
 
         print("Settings test başarıyla tamamlandı! 🎉")
         
