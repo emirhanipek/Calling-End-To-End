@@ -1,10 +1,10 @@
 import time
 from selenium.webdriver.common.by import By  
 from selenium.webdriver.common.keys import Keys
-from utils import click_element
+from utils import click_element , ss_alma
 
 def kayıt_ol_sirket_bilgileri(driver):
-
+    time.sleep(5)
     companyName = driver.find_element(By.ID, "companyName")
     companyName.clear()
     companyName.send_keys("Sirius Ai Tech")
@@ -66,5 +66,10 @@ def kayıt_ol_sirket_bilgileri(driver):
         input_field.send_keys(keyword)
         input_field.send_keys(Keys.ENTER) 
 
-    click_element(driver, By.XPATH, "//button[@type='submit']")
-
+    click_element(driver, By.XPATH, "//button[@type='submit']", "kayıt_ol_sirket_bilgileri")
+    time.sleep(10)
+    ss_alma("ss/entegrasyon_page.png")
+    driver.find_element(By.XPATH, "//button[contains(@class, 'text-white') and contains(@class, 'bg-black/100')]").click()
+    time.sleep(15)  
+    ss_alma("ss/anasayfa.png")
+    print("Şirket bilgileri başarılı bir şekilde dolduruldu.")

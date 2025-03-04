@@ -3,8 +3,15 @@ from selenium.webdriver.common.by import By
 import time
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+from utils import ss_alma , generate_phone_number
 
 def rehber_sayfası(driver):
+
+
+    driver.find_element(By.XPATH , '//*[@id="app"]/div/nav/nav/div/div/div[1]/div[2]/div/a[2]').click()
+
+    time.sleep(2)
+
     add_custom = driver.find_element(By.XPATH,'//*[@id="app"]/div/main/div/div[2]/div[2]/div[2]/button')
     add_custom.click()
 
@@ -20,8 +27,9 @@ def rehber_sayfası(driver):
     flag.click()
     time.sleep(1)
 
+    number = generate_phone_number()
     phone_enter = driver.find_element(By.XPATH,'//*[@id="app"]/div/main/div/div[5]/div/form/div[2]/div/div/input')
-    phone_enter.send_keys("+90 541 360 99 17")
+    phone_enter.send_keys(f"+90 {number}")
     time.sleep(1)
 
     email = driver.find_element(By.XPATH,'//*[@id="email"]')
@@ -86,4 +94,7 @@ def rehber_sayfası(driver):
     print('rehber 8')
 
     print('GuideBook Bitti')
+
+    ss_alma("ss/guidebook_page.png")
+    time.sleep(2)
 
