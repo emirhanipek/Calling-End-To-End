@@ -110,8 +110,7 @@ def settings_pages(driver):
         close_popup(driver)
         time.sleep(2)
         ss_alma("ss/settings_page.png")
-
-        print("Settings test başarıyla tamamlandı")
-        
+    
     except Exception as e:
+        ss_alma("ss/settings_page_error.png")
         print(f"Bir hata oluştu: {e}")

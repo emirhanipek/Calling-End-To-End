@@ -5,22 +5,24 @@ from utils import ss_alma
 import time
 
 def logout(driver):
-    # Çıkış yap
-    time.sleep(3)
-    driver.find_element(By.XPATH, "//*[@class='bg-transparent ml-4 hover:border-0 ring-0 focus:border-0 py-0 px-1 border-0 text-sm text-black text-opacity-50 hover:text-opacity-90']").click()
     try:
-        ok_button = WebDriverWait(driver, 8).until(EC.element_to_be_clickable((By.CLASS_NAME, "swal2-confirm")))
-        ok_button.click()
-        print("Popup bulundu ve kapatıldı")
-    except Exception:
-        print("Popup bulunamadı veya otomatik kapandı.")
+        time.sleep(3)
+        driver.find_element(By.XPATH, "//*[@class='bg-transparent ml-4 hover:border-0 ring-0 focus:border-0 py-0 px-1 border-0 text-sm text-black text-opacity-50 hover:text-opacity-90']").click()
+        try:
+            ok_button = WebDriverWait(driver, 8).until(EC.element_to_be_clickable((By.CLASS_NAME, "swal2-confirm")))
+            ok_button.click()
+            print("Popup bulundu ve kapatıldı")
+        except Exception:
+            print("Popup bulunamadı veya otomatik kapandı.")
 
-    try:
-        ss_alma("ss/logout_popup.png")
-        ok_button = WebDriverWait(driver, 8).until(EC.element_to_be_clickable((By.CLASS_NAME, "swal2-confirm")))
-        ok_button.click()
-        print("Popup bulundu ve kapatıldı")
-    except Exception:
-        print("Popup bulunamadı veya otomatik kapandı.")
-
-    time.sleep(3)
+        try:
+            ss_alma("ss/logout_basarili.png")
+            ok_button = WebDriverWait(driver, 8).until(EC.element_to_be_clickable((By.CLASS_NAME, "swal2-confirm")))
+            ok_button.click()
+            print("Popup bulundu ve kapatıldı")
+        except Exception:
+            print("Popup bulunamadı veya otomatik kapandı.")
+        time.sleep(3)
+    except Exception as e:
+        print(f"Logout olurken hata oluştu : {e}")
+        ss_alma("ss/logout_error.png")

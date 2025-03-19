@@ -1,71 +1,149 @@
-import torch
-import torchvision.transforms as transforms
-from torchvision.models import resnet50
-from PIL import Image
 import os
+import openai
+from PIL import Image
+import pytesseract
+from fpdf import FPDF
 import requests
-import json
-from telegram import Bot
-from telegram import InputFile
 from dotenv import load_dotenv
 import asyncio
+from datetime import date
+import re
+from unidecode import unidecode
 
-# .env dosyasını yükle
-load_dotenv()
+def clean_non_ascii(text):
+    return unidecode(text)
 
-# Telegram bot token ve chat ID
-BOT_TOKEN = os.getenv('BOT_TOKEN')
-CHAT_ID = os.getenv('CHAT_ID')
+class PDF(FPDF):
+    def header(self):
+        self.set_font("Arial", "B", 12)
+        self.cell(0, 20, "Call End-to-End Test Raporu", align="C", ln=True)
 
-# Telegram botu ile mesaj gönderme fonksiyonu
-async def send_telegram_message(image_path, caption):
-    bot = Bot(token=BOT_TOKEN)
-    with open(image_path, 'rb') as image_file:
-        await bot.send_photo(chat_id=CHAT_ID, photo=image_file, caption=caption)
+    def footer(self):
+        self.set_y(-15)
+        self.set_font("Arial", "I", 8)
+        self.cell(0, 10, f"Sayfa {self.page_no()}", align="C")
+    
+    # Güvenli metin yazdırma metodu
+    def safe_cell(self, w, h, txt='', border=0, ln=0, align='', fill=False, link=''):
+        # Metni ASCII karakterlere dönüştür
+        safe_txt = clean_non_ascii(txt)
+        self.cell(w, h, safe_txt, border, ln, align, fill, link)
+        
+    def safe_multi_cell(self, w, h, txt='', border=0, align='', fill=False):
+        # Metni ASCII karakterlere dönüştür
+        safe_txt = clean_non_ascii(txt)
+        self.multi_cell(w, h, safe_txt, border, align, fill)
 
+def analyze_image(image_path):
+    try:
+        # Görseldaki metni al
+        text = pytesseract.image_to_string(Image.open(image_path))
+        
+        # ASCII olmayan karakterleri temizle
+        text = clean_non_ascii(text)
+        
+        # OpenAI API isteği yap
+        client = openai.OpenAI()
+        response = client.chat.completions.create(
+            model="gpt-4o",  # Güncel model kullan
+            messages=[
+                {"role": "system", "content": clean_non_ascii("""
+                Bir test uzmanısın ve bir uygulamanın uçtan uca (end-to-end) testlerini yazıyorsun.
+                Belirli bölgelerde ekran görüntüleri (screenshot) aldın. Bu ekran görüntülerini yorumlamanı istiyorum.
+                Detaylı bir analiz yapmana gerek yok, sadece testin durumunu değerlendir. Eğer bir hata,
+                eksik yüklenen veri, veya başarısızlık (fail) varsa belirt. Eğer her şey sorunsuz çalışıyorsa
+                'Geçti' şeklinde özetle.
+                """)},       
+                {"role": "user", "content": f"Bu görseldaki metin: {text}\nBu gorseli analiz et ve modern bir şekilde rapor et.Ve en sonunda gecti mi kaldı diye bir yorum yaz."}
+            ],
+            max_tokens=300
+        )
+        
+        # Yanıtı ASCII karakterlere dönüştür - DÜZELTİLDİ
+        return clean_non_ascii(response.choices[0].message.content.strip())
+    
+    except Exception as e:
+        return f"Hata: {str(e)}"
+def create_pdf(image_folder, output_pdf):
+    pdf = PDF()
+    pdf.add_page()
+    pdf.set_font("Arial", "B", 16)
+    pdf.safe_cell(0, 10, "Gorsel Analiz Raporu", ln=True, align='C')
+    pdf.set_font("Arial", size=12)
+    pdf.safe_cell(0, 10, f"Tarih: {date.today().strftime('%d.%m.%Y')}", ln=True)
+    pdf.ln(5)
+
+    # Klasördeki her görsel için
+    for image_file in os.listdir(image_folder):
+        if image_file.endswith(('.png', '.jpg', '.jpeg')):
+            image_path = os.path.join(image_folder, image_file)
+            analysis = analyze_image(image_path)
+
+            pdf.add_page()
+            pdf.set_font("Arial", "B", 14)
+            pdf.safe_cell(0, 10, f"Gorsel: {image_file}", ln=True)
+            pdf.ln(5)
+            
+            # Görsel ekle
+            try:
+                img_width = 180
+                img = Image.open(image_path)
+                width_ratio = img_width / img.width
+                img_height = img.height * width_ratio
+                pdf.image(image_path, x=25, y=40, w=img_width)
+                
+                # Analiz metni için yeterli boşluk bırak
+                pdf.ln(img_height + 20)
+            except Exception as e:
+                pdf.ln(10)
+                pdf.safe_cell(0, 10, f"Gorsel yuklenemedi: {str(e)}", ln=True)
+                pdf.ln(10)
+            
+            pdf.set_font("Arial", "B", 8)
+            pdf.safe_cell(0, 10, "Analiz:", ln=True)
+            pdf.set_font("Arial", size=8)
+            pdf.safe_multi_cell(0, 10, analysis)
+            
+    # PDF'i kaydet
+    pdf.output(output_pdf)
+
+def sendTelegramMessage(file_path):
+    bot_token = os.getenv('BOT_TOKEN')
+    chat_id = os.getenv('CHAT_ID')
+    url = f"https://api.telegram.org/bot{bot_token}/sendDocument"
+    
+    try:
+        with open(file_path, 'rb') as file:
+            response = requests.post(url, data={"chat_id": chat_id}, files={"document": file})
+        return response.json()
+    except Exception as e:
+        print(f"Telegram mesaj gonderme hatasi: {e}")
+        return {"error": str(e)}
+
+# Asenkron fonksiyon
 async def yorumla_ve_yazdir(image_folder):
-    # Modeli yükle
-    model = resnet50(weights='IMAGENET1K_V1')
-    model.eval()
+    try:
+        print("PDF olusturuluyor...")
+        output_pdf = "call_e2e_test_raporu.pdf"
+        create_pdf(image_folder, output_pdf)
+        
+        print("Telegram'a gonderiliyor...")
+        response = sendTelegramMessage(output_pdf)
+        print("Islem tamamlandi.")
+        return response
+    except Exception as e:
+        print(f"Islem sirasinda hata: {e}")
+        return {"error": str(e)}
 
-    # ImageNet sınıf isimlerini yükle
-    LABELS_URL = "https://raw.githubusercontent.com/anishathalye/imagenet-simple-labels/master/imagenet-simple-labels.json"
-    response = requests.get(LABELS_URL)
-    labels = json.loads(response.text)
+if __name__ == "__main__":
+    load_dotenv()
+    openai.api_key = os.getenv('  ')
+    image_folder = "ss"
+    output_pdf = "reports/call_e2e_test_raporu.pdf"
 
-    # Klasördeki tüm görselleri al
-    image_files = [f for f in os.listdir(image_folder) if f.endswith('.png')]
-
-    # Görselleri yorumla ve sonuçları yazdır
-    for img_file in image_files:
-        img_path = os.path.join(image_folder, img_file)
-        img = Image.open(img_path).convert('RGB')
-        
-        preprocess = transforms.Compose([
-            transforms.Resize(256),
-            transforms.CenterCrop(224),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-        ])
-        
-        img_tensor = preprocess(img)
-        img_tensor = img_tensor.unsqueeze(0)
-        
-        with torch.no_grad():
-            preds = model(img_tensor)
-        
-        # En olası tahminleri al
-        _, indices = torch.topk(preds, 3)
-        percentages = torch.nn.functional.softmax(preds, dim=1)[0] * 100
-        decoded_preds = [(labels[idx], percentages[idx].item()) for idx in indices[0]]
-        
-        # Özel mesaj ile birlikte sonuçları yazdır
-        caption = f"Görsel: {img_file}\n"
-        caption += "Bu görsel, Selenium otomasyon testi ile her fonksiyon sonunda alınan bir ekran görüntüsüdür.\n"
-        caption += "Bu fotoğraflarda hata var mı? İşte en olası tahminler:\n"
-        for label, percentage in decoded_preds:
-            caption += f"{label}: {percentage:.2f}%\n"
-        caption += "\n"
-        
-        # Mesajı Telegram botu ile gönder
-        await send_telegram_message(img_path, caption)
+    try:
+        create_pdf(image_folder, output_pdf)
+        response = sendTelegramMessage(output_pdf)
+        print("Rapor gonderildi:", response)
+    except Exception as e:
+        print(f"Hata olustu: {e}")

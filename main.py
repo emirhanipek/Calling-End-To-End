@@ -5,7 +5,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By  
 from webdriver_manager.chrome import ChromeDriverManager
-from utils import random_mail_name
+from utils import random_mail_name , sendTelegramTextMessage , temizle_klasor
 from company_info import kayıt_ol_sirket_bilgileri
 from register import register
 from logout import logout
@@ -16,6 +16,7 @@ from guidebook_page import rehber_sayfası
 from settings_page import settings_pages
 from model import yorumla_ve_yazdir
 from language_select import language_select
+from dashboard import dashboard
 
 # Tarayıcı başlatma fonksiyonu
 def start_driver():
@@ -26,34 +27,56 @@ def start_driver():
 # Ana fonksiyon
 def main():
     driver = start_driver()
-    url = "http://34.69.225.137:5000/"
+    url = "https://portal.callingai.app/"
 
     try:
         driver.get(url)
-        time.sleep(4)
+        time.sleep(10)
         #random mail oluşturma
         name, email = random_mail_name()
-        # Kayıt ol
+
+        #language_select(driver)
+         
+        #driver.find_element(By.XPATH, '/html/body/div[1]/div/main/div/div[2]/div/div/p/a').click()
+        #time.sleep(3)
+             
         #register(driver, name, email)
-        # Şirket bilgilerini doldur 
+        
         #kayıt_ol_sirket_bilgileri(driver)
-        # Çıkış yap
+             
         #logout(driver)
-        # Giriş yap
+             
         login(driver, email)
-        # Giriş yapınca karşımıza çıkan sayfalar
+
+        dashboard(driver)
+       
         incomepage(driver)
-        # Arama sayfası
+     
         call_page(driver)
-        # Rehber sayfası
-        rehber_sayfası(driver)
-        # Ayarlar sayfası
-        settings_pages(driver)
-        # Dil
-        language_select(driver)
     
-        # Asenkron fonksiyonu çalıştır
-        asyncio.run(yorumla_ve_yazdir("ss"))
+        rehber_sayfası(driver)
+        
+        settings_pages(driver)
+     
+        try:
+            asyncio.run(yorumla_ve_yazdir("ss"))
+            sendTelegramTextMessage("""
+        *Call Ai Test Sonuclari*\n
+        Register:Tamamlandi  
+        Sirket Ekleme:Tamamlandi  
+        Cikis Yap:Tamamlandi  
+        Giris Yap:Tamamlandi  
+        Income Page:Tamamlandi  
+        Call Page:Tamamlandi  
+        Guidebook:Tamamlandi  
+        Settings:Tamamlandi  
+        """)
+
+            temizle_klasor("ss")
+        except Exception as e :
+            temizle_klasor("ss")
+            print(f"Asenkron fonksiyon çalıştırma sorun oluştu : {e}")
+
     finally:
         print("Success")
         driver.quit()

@@ -5,6 +5,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By  
 import random
+import os
+import shutil
+import requests
 
 def generate_phone_number():
     # Türkiye'deki GSM operatörlerinin numara başlıkları
@@ -66,3 +69,46 @@ def click_element(driver, by, value,image_name):
 def ss_alma(filename):
     screenshot = pyautogui.screenshot()
     screenshot.save(filename)
+
+
+
+def temizle_klasor(klasor_yolu):
+    if os.path.exists(klasor_yolu):
+        shutil.rmtree(klasor_yolu)  # Klasörü ve içeriğini sil
+        os.makedirs(klasor_yolu)  # Klasörü tekrar oluştur
+
+
+def clean_non_ascii(text):
+    return ''.join([i if ord(i) < 128 else ' ' for i in text])
+
+def sendTelegramTextMessage(message_text):
+    """
+    Telegram'a sadece metin mesajı gönderen fonksiyon
+    
+    Args:
+        message_text (str): Gönderilecek metin mesajı
+        
+    Returns:
+        dict: API yanıtı veya hata durumunda bilgi içeren sözlük
+    """
+    bot_token = os.getenv('BOT_TOKEN')
+    chat_id = os.getenv('CHAT_ID')
+    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+    
+    try:
+        # ASCII olmayan karakterleri temizle (isteğe bağlı)
+        clean_text = clean_non_ascii(message_text)
+        
+        # Mesajı gönder
+        payload = {
+            "chat_id": chat_id,
+            "text": clean_text,
+            "parse_mode": "HTML"  # HTML formatında metin göndermeyi destekler
+        }
+        
+        response = requests.post(url, data=payload)
+        return response.json()
+        
+    except Exception as e:
+        print(f"Telegram metin mesaji gonderme hatasi: {e}")
+        return {"error": str(e)}

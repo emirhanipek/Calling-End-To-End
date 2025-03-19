@@ -1,72 +1,62 @@
-# Calling-End-To-End
+# Proje Kurulum Kılavuzu
 
-Bu proje, **Calling-End-To-End** adında bir end-to-end (E2E) test projesidir. Amaç, uygulamanın tüm iş akışlarını baştan sona test ederek, olası hataları ve eksiklikleri erken aşamada tespit etmektir.
+Bu proje, belirli bağımlılıkları olan bir Python uygulamasıdır. Aşağıdaki adımları takip ederek projeyi kurabilir ve çalıştırabilirsiniz.
 
-## Projenin Amacı
+## 1. Sanal Makine (Virtual Environment) Oluşturma
 
-- Uygulamanın tüm bileşenlerinin sorunsuz çalıştığından emin olmak.
-- Kullanıcı senaryolarını eksiksiz bir şekilde test etmek.
-- Otomatikleştirilmiş testler ile zaman tasarrufu sağlamak.
-- Sistemin kararlılığını ve performansını değerlendirmek.
-
-## Kullanılan Teknolojiler
-
-- **Test Framework:** [Örneğin Cypress, Playwright veya Selenium]
-- **Dil:** [Örneğin JavaScript, TypeScript, Python]
-- **Entegrasyonlar:** API, Database, Authentication
-
-## Kurulum
-
-Proje bağımlılıklarını yüklemek için:
-
+Öncelikle, bağımlılıkları izole etmek için bir sanal makine oluşturun:
 ```bash
-npm install
+python3 -m venv myenv
 ```
 
-Testleri çalıştırmak için:
+## 2. Sanal Makineyi Aktifleştirme
 
+**MacOS/Linux:**
 ```bash
-npm run test
+source myenv/bin/activate
 ```
 
-## Test Senaryoları
-
-1. **Kullanıcı Kaydı**  
-   - Geçerli bilgilerle kayıt olma
-   - Eksik veya hatalı bilgilerle kayıt olma
-
-2. **Kullanıcı Girişi**  
-   - Doğru bilgilerle giriş
-   - Yanlış bilgilerle giriş
-   - Şifre sıfırlama
-
-3. **Çağrı Başlatma ve Sonlandırma**  
-   - Çağrı başlatma
-   - Çağrı sırasında mesaj gönderme
-   - Çağrı sonlandırma
-
-4. **Veri Doğrulama**  
-   - API'den gelen verilerin kontrolü
-   - Database’e doğru veri kaydı
-
-## Dosya Yapısı
-
-```
-Calling-End-To-End/
-|-- tests/
-|   |-- authTests.js
-|   |-- callTests.js
-|   |-- dataValidationTests.js
-|-- utils/
-|-- config/
-|-- README.md
+**Windows:**
+```bash
+myenv\Scripts\activate
 ```
 
-## Katkıda Bulunma
+## 3. Gerekli Paketleri Yükleme
 
-Katkıda bulunmak için lütfen bir **Pull Request** oluşturun. Tüm değişiklikler test edilmeli ve dokümantasyona uygun olmalıdır.
+Tüm bağımlılıkları içeren `requirements.txt` dosyasını yüklemek için:
+```bash
+pip install -r requirements.txt
+```
 
-## Lisans
+Eğer `requirements.txt` dosyası eksikse veya belirli paketleri elle yüklemek isterseniz, aşağıdaki komutları kullanabilirsiniz:
+```bash
+pip install openai
+pip install pytesseract
+pip install fpdf
+pip install unidecode
+```
 
-Bu proje MIT lisansı altındadır.
+## 4. Ortam Değişkenleri (ENV Dosyası)
+
+Projenin düzgün çalışabilmesi için `.env` dosyasını oluşturmanız ve ilgili ortam değişkenlerini tanımlamanız gerekmektedir. Örnek bir `.env` dosyası:
+```env
+API_KEY=your_api_key_here
+SECRET_KEY=your_secret_key_here
+```
+
+Bu dosyanın `.gitignore` içinde olduğundan emin olun, böylece hassas bilgiler GitHub’a yüklenmez.
+
+## 5. Uygulamayı Çalıştırma
+
+Tüm bağımlılıklar yüklendikten sonra, uygulamayı şu şekilde çalıştırabilirsiniz:
+```bash
+python main.py
+```
+
+## 6. Sanal Ortamdan Çıkış Yapma
+
+Eğer sanal ortamdan çıkmak isterseniz, şu komutu kullanabilirsiniz:
+```bash
+deactivate
+```
 
