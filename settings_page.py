@@ -1,9 +1,13 @@
+import time
+from selenium.webdriver.common.by import By  
+from utils import click_element , close_popup , ss_alma
 
 
 def settings_pages(driver):
     try:
-        time.sleep(2)  # Sayfa yüklenmesi için bekleme
-        
+        print("Settings testi başladı")
+        driver.find_element(By.XPATH,'//*[@id="app"]/div/nav/nav/div/div/div[1]/div[2]/div/a[3]').click()
+        time.sleep(5)  
         # Company Name
         companyName = driver.find_element(By.XPATH, '//*[@id="companyName"]')
         companyName.clear()
@@ -12,9 +16,10 @@ def settings_pages(driver):
         time.sleep(1)
         click_submit = driver.find_element(By.XPATH, '//*[@id="app"]/div/main/div/form/div[5]/button')
         click_submit.click()
-        click_element(driver, By.XPATH, "/html/body/div[7]/div/div[6]/button[1]")
+        close_popup(driver)
         time.sleep(2)
         
+        print("Company Name başarıyla güncellendi")
         # Short Name
         shortname = driver.find_element(By.XPATH, '//*[@id="shortName"]')
         shortname.clear()
@@ -24,8 +29,8 @@ def settings_pages(driver):
         click_submit = driver.find_element(By.XPATH, '//*[@id="app"]/div/main/div/form/div[5]/button')
         click_submit.click()
         time.sleep(2)
-        click_element(driver, By.XPATH, "/html/body/div[7]/div/div[6]/button[1]")
-        
+        close_popup(driver)
+        print("Short Name başarıyla güncellendi")
         # Phone
         phone = driver.find_element(By.XPATH, '//*[@id="phone"]')
         phone.clear()
@@ -35,8 +40,8 @@ def settings_pages(driver):
         click_submit = driver.find_element(By.XPATH, '//*[@id="app"]/div/main/div/form/div[5]/button')
         click_submit.click()
         time.sleep(2)
-        click_element(driver, By.XPATH, "/html/body/div[7]/div/div[6]/button[1]")
-        
+        close_popup(driver)
+        print("Phone başarıyla güncellendi")
         # Email
         email = driver.find_element(By.XPATH, '//*[@id="email"]')
         email.clear()
@@ -46,8 +51,8 @@ def settings_pages(driver):
         click_submit = driver.find_element(By.XPATH, '//*[@id="app"]/div/main/div/form/div[5]/button')
         click_submit.click()
         time.sleep(2)
-        click_element(driver, By.XPATH, "/html/body/div[7]/div/div[6]/button[1]")
-        
+        close_popup(driver)
+        print("Email başarıyla güncellendi")
         # Address
         address = driver.find_element(By.XPATH, '//*[@id="address"]')
         address.clear()
@@ -57,8 +62,8 @@ def settings_pages(driver):
         click_submit = driver.find_element(By.XPATH, '//*[@id="app"]/div/main/div/form/div[5]/button')
         click_submit.click()
         time.sleep(2)
-        click_element(driver, By.XPATH, "/html/body/div[7]/div/div[6]/button[1]")
-        
+        close_popup(driver)
+        print("Address başarıyla güncellendi")
         # Start Time
         startsAt = driver.find_element(By.XPATH, '//*[@id="startsAt"]')
         startsAt.clear()
@@ -68,8 +73,8 @@ def settings_pages(driver):
         click_submit = driver.find_element(By.XPATH, '//*[@id="app"]/div/main/div/form/div[5]/button')
         click_submit.click()
         time.sleep(2)
-        click_element(driver, By.XPATH, "/html/body/div[7]/div/div[6]/button[1]")
-        
+        close_popup(driver)
+        print("Start Time başarıyla güncellendi")
         # Finish Time
         finishesAt = driver.find_element(By.XPATH, '//*[@id="finishesAt"]')
         finishesAt.clear()
@@ -79,8 +84,8 @@ def settings_pages(driver):
         click_submit = driver.find_element(By.XPATH, '//*[@id="app"]/div/main/div/form/div[5]/button')
         click_submit.click()
         time.sleep(2)
-        click_element(driver, By.XPATH, "/html/body/div[7]/div/div[6]/button[1]")
-        
+        close_popup(driver)
+        print("Finish Time başarıyla güncellendi")
         # About Us
         aboutus = driver.find_element(By.XPATH, '//*[@id="about"]')
         aboutus.clear()
@@ -91,8 +96,8 @@ def settings_pages(driver):
         click_submit = driver.find_element(By.XPATH, '//*[@id="app"]/div/main/div/form/div[5]/button')
         click_submit.click()
         time.sleep(2)
-        click_element(driver, By.XPATH, "/html/body/div[7]/div/div[6]/button[1]")
-        
+        close_popup(driver)
+        print("About Us başarıyla güncellendi")
         # Assistant Name
         assistantName = driver.find_element(By.XPATH, '//*[@id="assistantName"]')
         assistantName.clear()
@@ -102,9 +107,10 @@ def settings_pages(driver):
         click_submit = driver.find_element(By.XPATH, '//*[@id="app"]/div/main/div/form/div[5]/button')
         click_submit.click()
         time.sleep(2)
-        click_element(driver, By.XPATH, "/html/body/div[7]/div/div[6]/button[1]")
-
-        print("Settings test başarıyla tamamlandı! 🎉")
-        
+        close_popup(driver)
+        time.sleep(2)
+        ss_alma("ss/settings_page.png")
+    
     except Exception as e:
+        ss_alma("ss/settings_page_error.png")
         print(f"Bir hata oluştu: {e}")
